@@ -1,0 +1,63 @@
+{
+  "manifest_version": 2,
+  "name": "Extractor",
+  "description": "HYUDBLAB_MENU_EXTRACTOR",
+  "version": "1.0",
+  "browser_action": {
+    "default_icon": "icons/icon.png",
+    "default_popup": "scripts-popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*",
+        "<all_urls>"
+      ],
+      "js": [
+        "modules/jquery-3.2.0.min.js",
+        "modules/jquery.highlight.js",
+        "modules/communication.es6",
+        "scripts-content/Node.es6",
+        "scripts-content/WebPage.es6",
+        "scripts-content/content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "background": {
+    "scripts": [
+//      "modules/himalaya.js",
+      "modules/jquery-3.2.0.min.js",
+
+      "modules/communication.es6",
+      "scripts-background/background.js"
+    ],
+    "persistent": true
+  },
+  "permissions": [
+    "cookies",
+    "<all_urls>",
+    "tabs",
+    "sessions",
+    "storage",
+    "downloads",
+    "alarms",
+    "pageCapture"
+  ],
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U",
+        "mac": "Alt+Shift+U"
+      }
+    },
+    "toggle-feature": {
+      "suggested_key": {
+        "default": "Alt+Shift+T",
+        "linux": "Ctrl+Shift+T"
+      },
+      "description": "Send a 'toggle-feature' event"
+    }
+  }
+}
