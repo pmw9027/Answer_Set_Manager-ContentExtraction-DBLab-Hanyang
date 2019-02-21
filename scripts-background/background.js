@@ -218,12 +218,15 @@ chrome.runtime.onMessage.addListener(
 
                 _data = {
                     grant_type:'password',
+                    scope:'read write',
                     username:request.data['username'],
                     password:request.data['password']
                 };
 
                 ajax_request("/o/token/", "POST", _data, "json",
                     function(xhr){
+
+                        console.log( btoa(CLIENT_ID + ":" +CLIENT_SECRET));
                         xhr.setRequestHeader ("Authorization", "Basic " + btoa(CLIENT_ID + ":" +CLIENT_SECRET));
 
                     },
@@ -236,8 +239,7 @@ chrome.runtime.onMessage.addListener(
                                 xhr.setRequestHeader("Authorization", "Bearer "+account.token);
 
                             },
-                            function(data) {
-
+                            data => {
                                 let _data = data['data'];
                                 _data.forEach(function (value, key) {
 
@@ -289,27 +291,21 @@ chrome.runtime.onMessage.addListener(
             case Communication.MAIN_CONTENT_CHECK():
 
                 _DEBUG_MODE ? _debug(0, "Message is sent to Server (code:"+Communication.LOGIN()+")\n"+JSON.stringify(request.data)) : false;
+                _data = {
+                    page:page_list[SYSTEM.CurPage],
+                    answer_dom:request.data['answer_dom']
+                };
 
-                $.ajax({
-                    url: "http://" + HOST + ":"+PORT+"/answers",
-                    method: "POST",
-                    data: JSON.stringify({
-                        page:page_list[list_num],
-                        answer_dom:request.data['answer_dom']
-                    }),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    xhrFields: { withCredentials: true },
-                    beforeSend: function(xhr) {
+                ajax_request("/answers/answers/","POST", _data,"text",
+                    function(xhr){
+
                         xhr.setRequestHeader("Authorization", "Bearer "+account.token);
+
                     },
-                    success:function (data) {
-                        console.log("test");
-                    },
-                    error:function (a, b, c) {
-                        console.log(a, b, c)
-                    }
-                });
+                    function(data){
+                        // account = new Account();
+                        // sendResponse({code:Communication.LOGOUT(),data:123});
+                    });
 
                 break;
             case Communication.MAIN_CONTENT_SHOW():
@@ -375,8 +371,8 @@ chrome.runtime.onMessage.addListener(
                     console.log(SYSTEM.CurPage);
 
 
-                    chrome.tabs.update({url:SYSTEM.CurPage.url});
-                    chrome.tabs.update({url:HOST+":"+PORT+"/answer/page/"+SYSTEM.CurPage.pk});
+                    // chrome.tabs.update({url:SYSTEM.CurPage.url});
+                    chrome.tabs.update({url:HOST+":"+PORT+"/answers/pages/"+SYSTEM.CurPage.pk});
 
                 }
 
@@ -500,9 +496,7 @@ function ajax_request(path, method, data, dataType, bf_callback, af_callback, er
         },
         error:function (request, status, error) {
             // console.log(a);
-            console.log(request);
-            console.log(status);
-            console.log(error);
+            console.log(request, status, error);
             typeof er_callback === 'function' && er_callback(request, status, error);
 
         }
